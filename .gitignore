@@ -1,0 +1,45 @@
+# ── OS ────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# ── IDEs ──────────────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# ── Python / Backend ─────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
+env/
+.env
+*.so
+
+# ── Flutter / Frontend ───────────────────────────────────
+# (frontend/.gitignore handles most Flutter-specific ignores)
+frontend/.dart_tool/
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/pubspec.lock
+frontend/build/
+frontend/.pub-cache/
+frontend/.pub/
+
+# ── Misc ─────────────────────────────────────────────────
+*.log
+.pytest_cache/
+node_modules/
+.coverage
+htmlcov/
