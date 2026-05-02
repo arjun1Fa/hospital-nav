@@ -31,7 +31,7 @@ def get_route(req: RouteRequest):
         raise HTTPException(status_code=503, detail="Routing engine not initialized (missing graph data)")
         
     try:
-        path_nodes, distance = routing_engine.find_path_astar(req.start, req.end)
+        path_nodes, distance = routing_engine.find_path_astar(req.start, req.end, req.accessible)
         
         if not path_nodes:
             # If start == end, distance is 0 but path might be empty based on A* implementation

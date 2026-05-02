@@ -89,8 +89,11 @@ class RoutingEngine:
         # 10 meters baseline penalty per floor to ensure heuristic is admissible
         return math.sqrt(dx * dx + dy * dy) + (floor_diff * 10.0)
 
-    def _get_effective_weight(self, source_id: str, edge: Edge) -> float:
-        """Calculate the effective weight of an edge, considering floor changes."""
+    def _get_effective_weight(self, source_id: str, edge: Edge, accessible_only: bool = False) -> float:
+        """Calculate the effective weight of an edge, considering floor changes and accessibility."""
+        if accessible_only and not edge.accessible:
+            return float('inf')
+            
         source_node = self.nodes[source_id]
         target_node = self.nodes[edge.target]
         weight = edge.weight
@@ -109,7 +112,7 @@ class RoutingEngine:
             
         return weight
 
-    def find_path_astar(self, start_id: str, end_id: str) -> Tuple[List[Node], float]:
+    def find_path_astar(self, start_id: str, end_id: str, accessible_only: bool = False) -> Tuple[List[Node], float]:
         """
         Find the shortest path using A* algorithm with Euclidean heuristic.
         """
@@ -137,7 +140,13 @@ class RoutingEngine:
                 
             for edge in self.adj[current_node]:
                 neighbor = edge.target
-                tentative_g = g_score[current_node] + self._get_effective_weight(current_node, edge)
+                effective_weight = self._get_effective_weight(current_node, edge, accessible_only)
+                
+                # Skip inaccessible paths if required
+                if effective_weight == float('inf'):
+                    continue
+                    
+                tentative_g = g_score[current_node] + effective_weight
                 
                 if tentative_g < g_score[neighbor]:
                     previous[neighbor] = current_node
