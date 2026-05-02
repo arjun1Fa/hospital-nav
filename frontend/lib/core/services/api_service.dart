@@ -30,9 +30,9 @@ class ApiService {
   }) async {
     try {
       final data = {
-        if (qrCode != null) 'qr_code': qrCode,
-        if (wifiSignals != null) 'wifi_signals': wifiSignals,
-        if (cvEmbedding != null) 'cv_embedding': cvEmbedding,
+        'qr_code': ?qrCode,
+        'wifi_signals': ?wifiSignals,
+        'cv_embedding': ?cvEmbedding,
       };
 
       final response = await _dio.post('/predict-location', data: data);
