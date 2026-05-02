@@ -8,6 +8,9 @@ from fastapi import APIRouter
 
 from backend.app.models.location import LocationPredictionRequest, LocationPredictionResponse
 from backend.app.api.routes import routing_engine
+from backend.app.services.wifi_matcher import WifiMatcher
+from backend.app.services.cv_matcher import CvMatcher
+from backend.app.services.sensor_fusion import SensorFusionEngine
 
 logger = logging.getLogger(__name__)
 
@@ -25,27 +28,35 @@ try:
 except Exception as e:
     logger.warning(f"Could not load QR mapping: {e}")
 
+# Initialize matchers and fusion engine
+wifi_matcher = WifiMatcher()
+cv_matcher = CvMatcher()
+fusion_engine = SensorFusionEngine(wifi_matcher, cv_matcher)
+
 @router.post("/predict-location", response_model=LocationPredictionResponse, tags=["location"])
 def predict_location(req: LocationPredictionRequest):
     """
     Predict current location based on available sensor data.
-    Fallback chain: QR -> WiFi -> CV.
+    Uses Sensor Fusion (QR -> WiFi -> CV).
     """
-    # 1. QR Code (High confidence: 0.95)
-    if req.qr_code:
-        node_id = qr_mapping.get(req.qr_code)
-        if node_id and routing_engine and node_id in routing_engine.nodes:
-            node = routing_engine.nodes[node_id]
-            return LocationPredictionResponse(
-                node_id=node.id,
-                x=node.x,
-                y=node.y,
-                floor=node.floor,
-                confidence=0.95,
-                source="qr"
-            )
+    node_id, confidence, source = fusion_engine.predict_location(
+        qr_code=req.qr_code,
+        wifi_signals=req.wifi_signals,
+        cv_embedding=req.cv_embedding,
+        qr_mapping=qr_mapping
+    )
+    
+    if node_id and routing_engine and node_id in routing_engine.nodes:
+        node = routing_engine.nodes[node_id]
+        return LocationPredictionResponse(
+            node_id=node.id,
+            x=node.x,
+            y=node.y,
+            floor=node.floor,
+            confidence=confidence,
+            source=source
+        )
             
-    # Placeholder for WiFi and CV (to be implemented)
     return LocationPredictionResponse(
         confidence=0.0,
         source="none"
