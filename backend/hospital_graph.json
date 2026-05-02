@@ -23,6 +23,30 @@
       "floor": 0,
       "label": "Main Elevator (Ground)",
       "node_type": "elevator"
+    },
+    {
+      "id": "F1_ELEVATOR",
+      "x": 20.0,
+      "y": 0.0,
+      "floor": 1,
+      "label": "Main Elevator (Floor 1)",
+      "node_type": "elevator"
+    },
+    {
+      "id": "F1_CORRIDOR",
+      "x": 20.0,
+      "y": 10.0,
+      "floor": 1,
+      "label": "North Corridor",
+      "node_type": "corridor"
+    },
+    {
+      "id": "F1_ICU",
+      "x": 30.0,
+      "y": 10.0,
+      "floor": 1,
+      "label": "ICU",
+      "node_type": "room"
     }
   ],
   "edges": [
@@ -36,6 +60,27 @@
     {
       "source": "G_RECEPTION",
       "target": "G_ELEVATOR",
+      "weight": 10.0,
+      "type": "walk",
+      "accessible": true
+    },
+    {
+      "source": "G_ELEVATOR",
+      "target": "F1_ELEVATOR",
+      "weight": 5.0,
+      "type": "elevator",
+      "accessible": true
+    },
+    {
+      "source": "F1_ELEVATOR",
+      "target": "F1_CORRIDOR",
+      "weight": 10.0,
+      "type": "walk",
+      "accessible": true
+    },
+    {
+      "source": "F1_CORRIDOR",
+      "target": "F1_ICU",
       "weight": 10.0,
       "type": "walk",
       "accessible": true
