@@ -96,6 +96,11 @@ class RoutingEngine:
             
         source_node = self.nodes[source_id]
         target_node = self.nodes[edge.target]
+        
+        # Prevent illegal multi-floor jumps (e.g., walking through the ceiling)
+        if source_node.floor != target_node.floor and edge.type == EdgeType.WALK:
+            return float('inf')
+            
         weight = edge.weight
         
         # Add penalty for changing floors to avoid unnecessary floor hopping
