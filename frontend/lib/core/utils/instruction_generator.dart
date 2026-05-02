@@ -40,14 +40,14 @@ class InstructionGenerator {
           final dx2 = nextNext.x - next.x;
           final dy2 = nextNext.y - next.y;
           
-          final angle1 = atan2(dy1, dx1);
+          final angle1 = atan2(dy, dx);
           final angle2 = atan2(dy2, dx2);
           
           double turnAngle = (angle2 - angle1) * 180 / pi;
           
           // Normalize angle
-          while (turnAngle <= -180) turnAngle += 360;
-          while (turnAngle > 180) turnAngle -= 360;
+          while (turnAngle <= -180) { turnAngle += 360; }
+          while (turnAngle > 180) { turnAngle -= 360; }
 
           if (turnAngle.abs() > 30) {
             // Significant turn detected
