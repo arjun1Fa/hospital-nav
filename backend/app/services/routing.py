@@ -8,7 +8,7 @@ import heapq
 import math
 from typing import Dict, List, Optional, Tuple
 
-from backend.app.models.graph import GraphData, Node, Edge
+from backend.app.models.graph import GraphData, Node, Edge, EdgeType
 
 
 class RoutingEngine:
@@ -97,7 +97,15 @@ class RoutingEngine:
         
         # Add penalty for changing floors to avoid unnecessary floor hopping
         if source_node.floor != target_node.floor:
-            weight += 15.0
+            floor_diff = abs(source_node.floor - target_node.floor)
+            if edge.type == EdgeType.ELEVATOR:
+                # Elevators have a high initial wait time, but fast per-floor travel
+                weight += 20.0 + (floor_diff * 2.0)
+            elif edge.type == EdgeType.STAIRS:
+                # Stairs have no wait time, but high effort per floor
+                weight += (floor_diff * 15.0)
+            else:
+                weight += 15.0
             
         return weight
 
