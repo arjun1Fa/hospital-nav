@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../core/providers/location_provider.dart';
+import '../../core/services/api_service.dart';
 
 /// QR code scanner screen — scans hospital QR codes to fix location.
-class ScannerScreen extends StatefulWidget {
+class ScannerScreen extends ConsumerStatefulWidget {
   const ScannerScreen({super.key});
 
   @override
-  State<ScannerScreen> createState() => _ScannerScreenState();
+  ConsumerState<ScannerScreen> createState() => _ScannerScreenState();
 }
 
-class _ScannerScreenState extends State<ScannerScreen> {
+class _ScannerScreenState extends ConsumerState<ScannerScreen> {
   final MobileScannerController controller = MobileScannerController(
     detectionSpeed: DetectionSpeed.normal,
     facing: CameraFacing.back,
@@ -23,7 +28,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
     super.dispose();
   }
 
-  void _onDetect(BarcodeCapture capture) {
+  Future<void> _onDetect(BarcodeCapture capture) async {
     if (_isProcessing) return;
     
     final List<Barcode> barcodes = capture.barcodes;
@@ -35,21 +40,52 @@ class _ScannerScreenState extends State<ScannerScreen> {
         
         final String code = barcode.rawValue!;
         
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Scanned Node ID: $code'),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-          ),
-        );
+        ref.read(locationProvider.notifier).setLocating(true);
         
-        Future.delayed(const Duration(seconds: 2), () {
-          if (mounted) {
-            setState(() {
-              _isProcessing = false;
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Locating...'),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+            ),
+          );
+        }
+
+        // Call backend API
+        final apiService = ref.read(apiServiceProvider);
+        final newState = await apiService.predictLocation(qrCode: code);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          
+          if (newState != null && newState.currentNode != null) {
+            ref.read(locationProvider.notifier).updateLocation(
+              newState.currentNode!,
+              newState.source ?? 'qr',
+              newState.confidence,
+            );
+            ScaffoldMessenger.of(context).showSnackBar(
+               SnackBar(content: Text('Location found: ${newState.currentNode!.id}')),
+            );
+            
+            // Allow processing flag to reset after switching tab
+            Future.delayed(const Duration(seconds: 1), () {
+              if (mounted) setState(() => _isProcessing = false);
+            });
+            
+            // Switch to Map tab
+            context.go('/map');
+          } else {
+             ScaffoldMessenger.of(context).showSnackBar(
+               const SnackBar(content: Text('Invalid or unknown QR Code')),
+            );
+            
+            Future.delayed(const Duration(seconds: 2), () {
+              if (mounted) setState(() => _isProcessing = false);
             });
           }
-        });
-        break;
+        }
+        break; // Only process first valid barcode
       }
     }
   }
@@ -90,7 +126,14 @@ class _ScannerScreenState extends State<ScannerScreen> {
                 ],
               ),
             ),
-          )
+          ),
+          if (_isProcessing)
+             Container(
+              color: Colors.black54,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            )
         ],
       ),
     );
