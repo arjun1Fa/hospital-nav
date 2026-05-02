@@ -7,8 +7,11 @@ from pathlib import Path
 from typing import Dict, Optional, List
 
 class WifiMatcher:
-    def __init__(self, db_path: str = "backend/wifi_fingerprints.json"):
+    def __init__(self, db_path: str | None = None):
         self.fingerprints: List[dict] = []
+        if db_path is None:
+            _backend_dir = Path(__file__).resolve().parent.parent.parent
+            db_path = str(_backend_dir / "wifi_fingerprints.json")
         self._load_db(db_path)
 
     def _load_db(self, db_path: str):
