@@ -1,0 +1,44 @@
+{
+  "nodes": [
+    {
+      "id": "G_ENTRANCE",
+      "x": 0.0,
+      "y": 0.0,
+      "floor": 0,
+      "label": "Main Entrance",
+      "node_type": "entrance"
+    },
+    {
+      "id": "G_RECEPTION",
+      "x": 10.0,
+      "y": 0.0,
+      "floor": 0,
+      "label": "Reception",
+      "node_type": "room"
+    },
+    {
+      "id": "G_ELEVATOR",
+      "x": 20.0,
+      "y": 0.0,
+      "floor": 0,
+      "label": "Main Elevator (Ground)",
+      "node_type": "elevator"
+    }
+  ],
+  "edges": [
+    {
+      "source": "G_ENTRANCE",
+      "target": "G_RECEPTION",
+      "weight": 10.0,
+      "type": "walk",
+      "accessible": true
+    },
+    {
+      "source": "G_RECEPTION",
+      "target": "G_ELEVATOR",
+      "weight": 10.0,
+      "type": "walk",
+      "accessible": true
+    }
+  ]
+}
