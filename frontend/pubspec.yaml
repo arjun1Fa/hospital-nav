@@ -27,6 +27,8 @@ dependencies:
   # ── Sensors & orientation ──────────────────────────────
   sensors_plus: ^6.1.1
   flutter_compass: ^0.8.1
+  wifi_scan: ^0.4.0
+  permission_handler: ^11.3.1
 
   # ── Voice guidance ─────────────────────────────────────
   flutter_tts: ^4.2.0
