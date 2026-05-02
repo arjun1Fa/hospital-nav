@@ -12,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.core.config import settings
 from backend.app.api.routes import router as navigation_router
+from backend.app.api.location import router as location_router
 
 # ── FastAPI application ───────────────────────────────────────────
 app = FastAPI(
@@ -33,6 +34,7 @@ app.add_middleware(
 
 # ── Include routers ───────────────────────────────────────────────
 app.include_router(navigation_router)
+app.include_router(location_router)
 
 
 # ── Root endpoint ─────────────────────────────────────────────────
