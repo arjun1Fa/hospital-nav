@@ -5,7 +5,7 @@ import os
 import logging
 from fastapi import APIRouter, HTTPException
 
-from backend.app.models.graph import RouteRequest, RouteResponse
+from backend.app.models.graph import RouteRequest, RouteResponse, Node
 from backend.app.services.graph_loader import load_graph_from_json
 from backend.app.services.routing import RoutingEngine
 
@@ -55,3 +55,11 @@ def get_route(req: RouteRequest):
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/nodes", response_model=list[Node], tags=["navigation"])
+def get_nodes():
+    """Get all available nodes in the hospital graph."""
+    if routing_engine is None:
+        raise HTTPException(status_code=503, detail="Routing engine not initialized (missing graph data)")
+    
+    return list(routing_engine.nodes.values())
