@@ -80,12 +80,26 @@ class RoutingEngine:
         return path, distances[end_id]
 
     def heuristic(self, start_id: str, end_id: str) -> float:
-        """Calculate A* heuristic (Euclidean distance)."""
+        """Calculate A* heuristic (Euclidean distance + floor penalty)."""
         n1 = self.nodes[start_id]
         n2 = self.nodes[end_id]
         dx = n1.x - n2.x
         dy = n1.y - n2.y
-        return math.sqrt(dx * dx + dy * dy)
+        floor_diff = abs(n1.floor - n2.floor)
+        # 10 meters baseline penalty per floor to ensure heuristic is admissible
+        return math.sqrt(dx * dx + dy * dy) + (floor_diff * 10.0)
+
+    def _get_effective_weight(self, source_id: str, edge: Edge) -> float:
+        """Calculate the effective weight of an edge, considering floor changes."""
+        source_node = self.nodes[source_id]
+        target_node = self.nodes[edge.target]
+        weight = edge.weight
+        
+        # Add penalty for changing floors to avoid unnecessary floor hopping
+        if source_node.floor != target_node.floor:
+            weight += 15.0
+            
+        return weight
 
     def find_path_astar(self, start_id: str, end_id: str) -> Tuple[List[Node], float]:
         """
@@ -115,7 +129,7 @@ class RoutingEngine:
                 
             for edge in self.adj[current_node]:
                 neighbor = edge.target
-                tentative_g = g_score[current_node] + edge.weight
+                tentative_g = g_score[current_node] + self._get_effective_weight(current_node, edge)
                 
                 if tentative_g < g_score[neighbor]:
                     previous[neighbor] = current_node
