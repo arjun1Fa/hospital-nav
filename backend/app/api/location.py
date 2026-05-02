@@ -17,7 +17,8 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # Load QR mapping table
-QR_MAPPING_FILE = Path("backend/qr_mapping.json")
+_BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
+QR_MAPPING_FILE = _BACKEND_DIR / "qr_mapping.json"
 qr_mapping = {}
 
 try:
