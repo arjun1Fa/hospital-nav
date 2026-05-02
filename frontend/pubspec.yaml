@@ -1,0 +1,50 @@
+name: hospital_nav
+description: "Indoor hospital navigation — QR + WiFi + CV location fusion with AR wayfinding."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # ── State management ────────────────────────────────────
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # ── Routing ─────────────────────────────────────────────
+  go_router: ^14.8.1
+
+  # ── Networking ──────────────────────────────────────────
+  dio: ^5.7.0
+
+  # ── Camera & scanning ──────────────────────────────────
+  mobile_scanner: ^6.0.2
+  camera: ^0.11.1
+
+  # ── Sensors & orientation ──────────────────────────────
+  sensors_plus: ^6.1.1
+  flutter_compass: ^0.8.1
+
+  # ── Voice guidance ─────────────────────────────────────
+  flutter_tts: ^4.2.0
+
+  # ── UI utilities ───────────────────────────────────────
+  google_fonts: ^6.2.1
+  flutter_svg: ^2.0.17
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  riverpod_generator: ^2.6.3
+  build_runner: ^2.4.14
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/maps/
+    - assets/icons/
