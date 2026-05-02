@@ -3,6 +3,7 @@ API endpoints for graph navigation and routing.
 """
 import os
 import logging
+from pathlib import Path
 from fastapi import APIRouter, HTTPException
 
 from backend.app.models.graph import RouteRequest, RouteResponse, Node
@@ -13,11 +14,17 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-# Initialize graph and routing engine (if the JSON file exists)
-GRAPH_FILE = os.getenv("GRAPH_FILE", "hospital_graph.json")
+GRAPH_FILE = os.getenv("GRAPH_FILE", None)
+
+# Resolve the graph file path relative to the backend directory
+_BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
+if GRAPH_FILE:
+    _graph_path = Path(GRAPH_FILE)
+else:
+    _graph_path = _BACKEND_DIR / "hospital_graph.json"
 
 try:
-    graph_data = load_graph_from_json(GRAPH_FILE)
+    graph_data = load_graph_from_json(_graph_path)
     routing_engine = RoutingEngine(graph_data)
 except Exception as e:
     logger.warning(f"Failed to load graph during startup: {e}. Routing engine will be unavailable.")
