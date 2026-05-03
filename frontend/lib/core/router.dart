@@ -5,12 +5,13 @@ import '../features/home/home_screen.dart';
 import '../features/map/map_screen.dart';
 import '../features/scanner/scanner_screen.dart';
 import '../features/navigation/navigation_screen.dart';
+import '../features/scanner/wifi_collector_screen.dart';
 import '../shared/widgets/app_shell.dart';
 
 /// GoRouter provider — consumed via `ref.watch(routerProvider)`.
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/map',
+    initialLocation: '/home',
     routes: [
       ShellRoute(
         builder: (context, state, child) => AppShell(child: child),
@@ -38,6 +39,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/home',
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: '/wifi-collector',
+        builder: (context, state) => const WifiCollectorScreen(),
       ),
     ],
   );

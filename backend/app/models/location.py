@@ -18,3 +18,8 @@ class LocationPredictionResponse(BaseModel):
     floor: Optional[int] = Field(None, description="Predicted floor")
     confidence: float = Field(0.0, description="Overall confidence score (0.0 to 1.0)")
     source: str = Field(..., description="Primary source used (qr, wifi, cv, fusion, none)")
+
+class WifiFingerprintData(BaseModel):
+    """Data model for collecting Wi-Fi fingerprints."""
+    node_id: str = Field(..., description="Node ID where the fingerprint was collected")
+    signals: Dict[str, int] = Field(..., description="BSSID to RSSI mapping")

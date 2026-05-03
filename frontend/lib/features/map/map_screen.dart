@@ -125,6 +125,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         title: const Text('Hospital Map'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.wifi_find),
+            onPressed: () => context.push('/wifi-collector'),
+          ),
+          IconButton(
             icon: const Icon(Icons.layers),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(

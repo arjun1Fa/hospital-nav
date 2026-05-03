@@ -79,6 +79,24 @@ class ApiService {
     }
     return null;
   }
+
+  Future<bool> saveFingerprint({
+    required String nodeId,
+    required Map<String, int> signals,
+  }) async {
+    try {
+      final data = {
+        'node_id': nodeId,
+        'signals': signals,
+      };
+
+      final response = await _dio.post('/fingerprint', data: data);
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint('Error saving fingerprint: $e');
+      return false;
+    }
+  }
 }
 
 final apiServiceProvider = Provider<ApiService>((ref) {

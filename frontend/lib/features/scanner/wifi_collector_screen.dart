@@ -1,16 +1,17 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/utils/wifi_scanner.dart';
+import '../../core/services/api_service.dart';
 
 /// Screen to collect WiFi fingerprints and map them to Node IDs.
-class WifiCollectorScreen extends StatefulWidget {
+class WifiCollectorScreen extends ConsumerStatefulWidget {
   const WifiCollectorScreen({super.key});
 
   @override
-  State<WifiCollectorScreen> createState() => _WifiCollectorScreenState();
+  ConsumerState<WifiCollectorScreen> createState() => _WifiCollectorScreenState();
 }
 
-class _WifiCollectorScreenState extends State<WifiCollectorScreen> {
+class _WifiCollectorScreenState extends ConsumerState<WifiCollectorScreen> {
   final TextEditingController _nodeController = TextEditingController();
   bool _isScanning = false;
   Map<String, int> _lastScan = {};
@@ -44,20 +45,30 @@ class _WifiCollectorScreenState extends State<WifiCollectorScreen> {
       }
       
       final String nodeId = _nodeController.text.isEmpty ? "UNKNOWN" : _nodeController.text;
-      final fingerprint = {
-        "node_id": nodeId,
-        "signals": signals,
-      };
-      
-      // In a real app, POST to backend to save fingerprint
-      debugPrint("Collected fingerprint: ${jsonEncode(fingerprint)}");
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Collected ${signals.length} networks for $nodeId'),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-        ),
+      // POST to backend to save fingerprint
+      final apiService = ref.read(apiServiceProvider);
+      final success = await apiService.saveFingerprint(
+        nodeId: nodeId,
+        signals: signals,
       );
+      
+      if (mounted) {
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Saved ${signals.length} networks for $nodeId'),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to save fingerprint to server'),
+              backgroundColor: Colors.redAccent,
+            ),
+          );
+        }
+      }
     }
   }
 

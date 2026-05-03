@@ -6,7 +6,7 @@ import logging
 from pathlib import Path
 from fastapi import APIRouter
 
-from backend.app.models.location import LocationPredictionRequest, LocationPredictionResponse
+from backend.app.models.location import LocationPredictionRequest, LocationPredictionResponse, WifiFingerprintData
 from backend.app.api.routes import routing_engine
 from backend.app.services.wifi_matcher import WifiMatcher
 from backend.app.services.cv_matcher import CvMatcher
@@ -62,3 +62,32 @@ def predict_location(req: LocationPredictionRequest):
         confidence=0.0,
         source="none"
     )
+
+@router.post("/fingerprint", tags=["location"])
+def save_fingerprint(data: WifiFingerprintData):
+    """Save a collected Wi-Fi fingerprint to the database."""
+    db_path = _BACKEND_DIR / "wifi_fingerprints.json"
+    
+    # Load existing
+    current_data = {"fingerprints": []}
+    if db_path.exists():
+        try:
+            with open(db_path, "r", encoding="utf-8") as f:
+                current_data = json.load(f)
+        except Exception:
+            pass
+            
+    # Append new
+    current_data["fingerprints"].append({
+        "node_id": data.node_id,
+        "signals": data.signals
+    })
+    
+    # Save back
+    with open(db_path, "w", encoding="utf-8") as f:
+        json.dump(current_data, f, indent=2)
+        
+    # Reload matcher
+    wifi_matcher._load_db(str(db_path))
+    
+    return {"status": "success", "message": f"Saved fingerprint for {data.node_id}"}
